@@ -3,6 +3,7 @@ import java.util.stream.Collectors;
 import com.neuronrobotics.bowlerstudio.vitamins.Vitamins;
 import eu.mihosoft.vrl.v3d.CSG;
 import eu.mihosoft.vrl.v3d.Cube;
+import eu.mihosoft.vrl.v3d.Cylinder
 CSG generate(){
 	String type= "ElecFreakShaft"
 	if(args==null)
@@ -20,12 +21,14 @@ CSG generate(){
 	def priceValue = measurments.price
 	def sourceValue = measurments.source
 	def widthOfFinValue = measurments.widthOfFin
-	for(String key:measurments.keySet().stream().sorted().collect(Collectors.toList())){
-		println "ElecFreakShaft value "+key+" "+measurments.get(key);
-}
-	// Stub of a CAD object
-	CSG part = new Cube().toCSG()
-	return part
+	def lengthOfShaftValue=measurments.lengthOfShaft
+
+	CSG shaft = new Cylinder(diameterValue/2,lengthOfShaftValue).toCSG()
+	CSG cutter = new Cube(diameterValue, widthOfFinValue-0.2, lengthOfShaftValue).toCSG().toZMin()
+	CSG xy = shaft.intersect(cutter);
+	CSG yx = shaft.intersect(cutter.rotz(90));
+	
+	return xy.union(yx)
 		.setParameter(size)
 		.setRegenerate({generate()})
 }
